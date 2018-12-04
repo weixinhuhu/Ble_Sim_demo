@@ -134,7 +134,6 @@ public class MainActivity extends BleBaseActivity implements
         LogcatHelper.getInstance(this).stop();
     }
 
-
     private BroadcastReceiver mDiscoveryResult = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -153,7 +152,6 @@ public class MainActivity extends BleBaseActivity implements
                 }
                 mHandler.sendEmptyMessage(1);
             });
-
         }
     };
     /**
