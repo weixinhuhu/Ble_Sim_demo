@@ -39,4 +39,5 @@ public class CRCUtil {
 				+ Integer.toHexString(result[1]);
 		return s;
 	}
+
 }

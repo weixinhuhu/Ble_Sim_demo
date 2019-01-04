@@ -70,7 +70,6 @@ public class MainActivity extends BleBaseActivity implements
             }
         }
     };
-
     private Button btn_start;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -78,8 +77,10 @@ public class MainActivity extends BleBaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //日志输出
         LogcatHelper.getInstance(this).start();
+
         context = this;
         btn_start = findViewById(R.id.btn_start);
         btn_start.setOnClickListener(this);
@@ -89,6 +90,7 @@ public class MainActivity extends BleBaseActivity implements
         findViewById(R.id.btn_getPublicKey).setOnClickListener(this);
         findViewById(R.id.btn_getSignature).setOnClickListener(this);
         findViewById(R.id.btn_backup).setOnClickListener(this);
+        findViewById(R.id.btn_getSn).setOnClickListener(this);
         lv = findViewById(R.id.lv);
 
         //log输出
@@ -98,6 +100,7 @@ public class MainActivity extends BleBaseActivity implements
         mListViewLog = findViewById(R.id.log);
         if (null != mListViewLog) mListViewLog.setAdapter(mAdapterLog);
 
+        //蓝牙权限判断
         if (!bluetoothPermissions())
             return;
 
@@ -113,7 +116,6 @@ public class MainActivity extends BleBaseActivity implements
             mBlueToothDeviceAdapter = new BlueToothDeviceAdapter(mBlueList, context);
             mBLEServiceOperate.setServiceStatusCallback(this);
             mBLEServiceOperate.SetBroadcastReceiverCallBack( mDiscoveryResult );
-
             scanLeDevice(true);
         }else {
             Toast.makeText(context, "搜索不到设备的蓝牙适配器", Toast.LENGTH_SHORT).show();
@@ -124,7 +126,7 @@ public class MainActivity extends BleBaseActivity implements
             mBLEServiceOperate.setMAC( device.getAddress() );
             int connect = mBLEServiceOperate.connect(device.getAddress(), mStrProcessKey, 0,"1");//初始保护密钥认证
             Log.d("connect","connect:"+connect);
-            log("连接蓝牙卡状态:"+connect);
+            log("connect:"+connect);
         });
     }
 
@@ -154,6 +156,7 @@ public class MainActivity extends BleBaseActivity implements
             });
         }
     };
+
     /**
      * 设备搜索
      * @param enable 是否正在搜索的标示
@@ -226,17 +229,30 @@ public class MainActivity extends BleBaseActivity implements
                 }
                 break;
 
+            case R.id.btn_getSn:
+                try {
+                    String SelectApdu="80CA000010";
+                    log("发送指令: "+SelectApdu);
+                    String command = mBLEServiceOperate.sendAPDUCommand(SelectApdu, 0);
+                    Log.e("command:", "command:" + command);
+                    log("返回命令：" + command);
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                    log("发生错误："+e.getMessage());
+                }
+                break;
 
             case R.id.btn_create_seed:
                 try {
-                    String apdu_create_seed=ApduUtil.CreatSeed("11223344556677881122334455667788");
+                    String apdu_create_seed=ApduUtil.CreatSeed("11223344556677881122334455667788","11223344556677881122334455667788");
                     log("发送指令："+apdu_create_seed);
                     String command = mBLEServiceOperate.sendAPDUCommand(apdu_create_seed, 0);
+                    masterkey="";
                     if (command.length()>=136){
                         masterkey = command.substring(4, 132);
                     }
-                    Log.e("command:", "command:" + command);
-                    log("返回命令：" + ApduUtil.ErrMessage(command));
+                    log("返回命令:"+command);
                     log("masterkey: "+masterkey);
                 }catch (Exception e){
                     e.printStackTrace();
@@ -250,7 +266,7 @@ public class MainActivity extends BleBaseActivity implements
                     log("发送指令："+apdu_getPublicKey);
                     String command = mBLEServiceOperate.sendAPDUCommand(apdu_getPublicKey, 0);
                     Log.e("command:", "command:" + command);
-                    log("返回命令:" + ApduUtil.ErrMessage(command));
+                    log("返回命令:" + command);
                 }catch (Exception e){
                     e.printStackTrace();
                     log("发生错误："+e.getMessage());
@@ -261,11 +277,11 @@ public class MainActivity extends BleBaseActivity implements
                 try {
                     String apdu_btn_getSignature=ApduUtil.getSignature("3C",
                             "00000002",
-                            "112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788112233445566778811223344556677881122334455667788");
+                            "1122334455667788112233445566778811223344556677881122334455667788");
                     log("发送指令："+apdu_btn_getSignature);
                     String command = mBLEServiceOperate.sendAPDUCommand(apdu_btn_getSignature, 0);
                     Log.e("command:", "command:" + command);
-                    log("返回命令：" + ApduUtil.ErrMessage(command));
+                    log("返回命令："+command);
                 }catch (Exception e){
                     e.printStackTrace();
                     log("发生错误："+e.getMessage());
@@ -280,7 +296,7 @@ public class MainActivity extends BleBaseActivity implements
                             log("发送指令："+apdu_backup);
                             String command = mBLEServiceOperate.sendAPDUCommand(apdu_backup, 0);
                             Log.e("command:", "command:" + command);
-                            log("返回命令：" + ApduUtil.ErrMessage(command));
+                            log("返回指令："+command);
                             log("成功标识：  "+ command.substring(4, 6)+ "     [00成功/01失败]");
                             return;
                         }
@@ -328,38 +344,6 @@ public class MainActivity extends BleBaseActivity implements
     //结果
     @Override
     public void OnResult(boolean result, int action, String strKey) {
-        Log.i(TAG, "OnResult-result:" + result + "|action:" + action);
-        closeLoading();
-        if (action == ICallbackStatus.CONNECTED_STATUS) {
-            Log.i(TAG, "Status is CONNECTED_STATUS");
-            Logger.d("Process Key is " + strKey);
-
-            mStrProcessKey  =  strKey;                    //保存过程密钥
-            saveProcessKeyConfig();
-
-            if (Const.BLE_UI_MODE == Const.BLE_UI_SOCKET) {
-                //startActivity(new Intent(this.getApplicationContext(), BlueToothSIM_BusinessActivity.class));
-            } else if (Const.BLE_UI_MODE == Const.BLE_UI_UI) {
-                //startActivity(new Intent(this.getApplicationContext(), BlueToothSIM_UIActivity.class));
-            }
-            toastInfo("连接成功", false);
-            log("连接成功");
-        } else if ( action == ICallbackStatus.CONNECTED_TIMEOUT ) {
-            Logger.d( "连接超时", false );
-            toastInfo( "连接超时", false );
-        } else if ( action == ICallbackStatus.AUTHENTICATE_FAILURE ) {
-            Logger.d( "安全认证失败 ！");
-            toastInfo( "安全认证失败", false );
-            log("安全认证失败");
-        } else if (action == ICallbackStatus.DISCONNECT_STATUS) {
-            Logger.d( "连接设备失败 请重试");
-            toastInfo("连接设备失败 请重试", false);
-            log("连接设备失败 请重试");
-        } else if ( action == ICallbackStatus.APDUCOMMAND_TIMEOUT ) {
-            Logger.d( "执行命令超时");
-            toastInfo( "执行命令超时", false );
-            log("执行命令超时");
-        }
 
     }
 
@@ -372,8 +356,6 @@ public class MainActivity extends BleBaseActivity implements
             // 蓝牙初始化
             mBLEServiceOperate.setDeviceScanListener(this);
             mBLEServiceOperate.registerCallback(this);
-            //bleApduHandler = BleApduHandler.getInstance();
-            //btnScanDevice.performClick();
             btn_start.performClick();
         } else {
             toastInfo("蓝牙服务开启失败,请重启应用", true);

@@ -15,7 +15,6 @@ public class FM_Bytes {
     public static byte[] copyOfRange(byte[] data1,int start,int len) {
         byte[] data2 = new byte[len];
         System.arraycopy(data1, start, data2, 0, len);
-
         return data2;
     }
 
@@ -32,9 +31,7 @@ public class FM_Bytes {
             if (offset + len > data.length) {
                 len = data.length - offset;
             }
-
             int i = offset;
-
             while(i < offset + len) {
                 out.append(hexify(i >>> 8 & 255));
                 out.append(hexify(i & 255));
@@ -49,13 +46,10 @@ public class FM_Bytes {
                         out.append(hexify(b)).append(' ');
                         ascii[j] = b >= 32 && b < 127 ? (char)b : 46;
                     }
-
                     ++j;
                 }
-
                 out.append(' ').append(ascii).append("\n");
             }
-
             return out.toString();
         }
     }
@@ -79,7 +73,6 @@ public class FM_Bytes {
                 if (n > 0) {
                     out.append(' ');
                 }
-
                 out.append(hexChars[data[i] >> 4 & 15]);
                 out.append(hexChars[data[i] & 15]);
                 ++n;
@@ -88,7 +81,6 @@ public class FM_Bytes {
                     n = 0;
                 }
             }
-
             return out.toString();
         }
     }
@@ -111,7 +103,6 @@ public class FM_Bytes {
                 out.append(hexChars[data[i] >> 4 & 15]);
                 out.append(hexChars[data[i] & 15]);
             }
-
             return out.toString();
         }
     }
@@ -139,20 +130,16 @@ public class FM_Bytes {
             String toParse = byteString.substring(i, i + 2);
             result[i / 2] = (byte)Integer.parseInt(toParse, 16);
         }
-
         return result;
     }
 
     public static byte[] parseLittleEndianHexString(String byteString) {
         byte[] result = new byte[byteString.length() / 2 + 1];
-
         for(int i = 0; i < byteString.length(); i += 2) {
             String toParse = byteString.substring(i, i + 2);
             result[(byteString.length() - i) / 2] = (byte)Integer.parseInt(toParse, 16);
         }
-
         result[0] = 0;
         return result;
     }
-
 }

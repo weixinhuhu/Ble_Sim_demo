@@ -27,14 +27,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="启动蓝牙扫描" />
+            android:text="启动扫描" />
 
         <Button
             android:id="@+id/btn_close"
-            android:layout_width="wrap_content"
+            android:layout_width="89dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="关闭蓝牙扫描" />
+            android:text="关闭扫描" />
 
         <Button
             android:id="@+id/btn_select"
@@ -42,6 +42,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="选应用" />
+        <Button
+            android:id="@+id/btn_getSn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="获取SN" />
 
     </LinearLayout>
 
