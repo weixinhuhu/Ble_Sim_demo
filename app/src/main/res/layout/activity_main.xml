@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -13,7 +14,9 @@
         android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/bg_edittext"/>
+        android:background="@drawable/bg_edittext">
+
+    </ListView>
 
     <LinearLayout
         android:id="@+id/ll"
@@ -51,6 +54,43 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/log"
+        android:id="@+id/ll2"
+        >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="钱包索引" />
+
+        <EditText
+            android:id="@+id/txt_countid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:text="1"/>
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="" />
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="" />
+    </LinearLayout>
+
+
     <ListView
         android:id="@+id/log"
         android:layout_width="wrap_content"
@@ -62,13 +102,14 @@
         android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/bg_edittext" />
+        android:background="@drawable/bg_edittext" >
+    </ListView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/log"
+        android:layout_below="@id/ll2"
         android:id="@+id/ll1"
         >
         <Button
@@ -84,10 +125,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="获取公钥" />
+
         <Button
             android:id="@+id/btn_getSignature"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@+id/ll"
             android:layout_weight="1"
             android:text="签名" />
@@ -99,5 +141,6 @@
             android:layout_weight="1"
             android:text="恢复seed" />
     </LinearLayout>
+
 
 </RelativeLayout>
